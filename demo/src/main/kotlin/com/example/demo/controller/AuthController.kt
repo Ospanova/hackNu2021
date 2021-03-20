@@ -1,5 +1,6 @@
 package com.example.demo.controller
 
+import com.example.demo.controller.models.Token
 import com.example.demo.dtos.LoginDTO
 import com.example.demo.dtos.RegisterDTO
 import com.example.demo.dtos.ResponseMessage
@@ -39,11 +40,11 @@ class AuthController(val userService: UserService) {
         val issuer = user.id.toString()
         val token = Jwts.builder().setIssuer(issuer).setExpiration(Date(System.currentTimeMillis() + 60*24*60*60*10000))
             .signWith(SignatureAlgorithm.HS256, "secret").compact()
-        val cookie  = Cookie("jwt", token)
-        cookie.isHttpOnly = true
-        response.addCookie(cookie)
+//        val cookie  = Cookie("jwt", token)
+//        cookie.isHttpOnly = true
+//        response.addCookie(cookie)
         println("Success.Login " + user.toString())
-        return ResponseEntity.ok(ResponseMessage("success"))
+        return ResponseEntity.ok(Token(token))
     }
     @GetMapping("user")
     fun user(@CookieValue("jwt") jwt: String?) : ResponseEntity<Any> {
