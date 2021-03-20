@@ -1,10 +1,11 @@
 package com.example.demo.controller.models
 
-import sun.plugin2.message.Message
+import com.example.demo.entities.MessageDB
+
 
 data class Group (
     val level: String?,
     val name: String,
-    val lastMessage: Message? = null,
+    val lastMessage: MessageDB? = null,
     val id: Long
 )
