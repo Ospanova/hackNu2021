@@ -22,10 +22,11 @@ import javax.servlet.http.HttpServletResponse
 class AuthController(val userService: UserService) {
 
     @PostMapping("register")
-    fun register(@RequestBody body: RegisterDTO) : ResponseEntity<UserClient> {
+    fun register(@RequestBody body: RegisterDTO, response: HttpServletResponse) : ResponseEntity<UserClient> {
         println("Register " + body.toString())
         val user  = UserClient(username = body.username, email = body.email)
         user.password = body.password
+        response.addHeader("Access-Control-Allow-Origin", "*")
         println("Success.Register " + user.toString())
         return ResponseEntity.ok(this.userService.save(user))
     }
@@ -43,6 +44,7 @@ class AuthController(val userService: UserService) {
 //        val cookie  = Cookie("jwt", token)
 //        cookie.isHttpOnly = true
 //        response.addCookie(cookie)
+        response.addHeader("Access-Control-Allow-Origin", "*")
         println("Success.Login " + user.toString())
         return ResponseEntity.ok(Token(token))
     }

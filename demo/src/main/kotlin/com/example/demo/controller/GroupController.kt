@@ -10,12 +10,14 @@ import com.example.demo.services.SubscriptionService
 import com.example.demo.services.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/groups")
 class GroupController (val service: SubscriptionService, val groupRepository: GroupRepository, val userService: UserService) {
     @GetMapping
-    fun findAll(@RequestHeader("jwt") jwt: String?): ResponseEntity<Any> {
+    fun findAll(@RequestHeader("jwt") jwt: String?, response: HttpServletResponse): ResponseEntity<Any> {
+        response.addHeader("Access-Control-Allow-Origin", "*")
         val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
         val groups = this.service.getSubscibedGroups(user.id).toSet().map {
             val group = groupRepository.getOne(it)
@@ -24,7 +26,8 @@ class GroupController (val service: SubscriptionService, val groupRepository: Gr
         return ResponseEntity.ok(groups)
     }
     @PostMapping
-    fun newGroup(@RequestHeader("jwt") jwt: String?, @RequestBody group: GroupDB): ResponseEntity<GroupDB> {
+    fun newGroup(@RequestHeader("jwt") jwt: String?, @RequestBody group: GroupDB, response: HttpServletResponse): ResponseEntity<GroupDB> {
+        response.addHeader("Access-Control-Allow-Origin", "*")
         val newGroup = this.groupRepository.save(group)
         if (jwt != null) {
             val user = userService.getUserFromCookie(jwt)
@@ -35,13 +38,15 @@ class GroupController (val service: SubscriptionService, val groupRepository: Gr
         return ResponseEntity.ok(newGroup)
     }
     @PostMapping("pin/{groupId}")
-    fun pinGroup(@RequestHeader("jwt") jwt: String?, @PathVariable groupId: Long) : ResponseEntity<Any> {
+    fun pinGroup(@RequestHeader("jwt") jwt: String?, @PathVariable groupId: Long, response: HttpServletResponse) : ResponseEntity<Any> {
+        response.addHeader("Access-Control-Allow-Origin", "*")
         val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
         service.addNew(user.id, groupId)
         return ResponseEntity.ok(ResponseMessage("success"))
     }
     @GetMapping("locationGroups")
-    fun getLocationGroups(@RequestHeader("jwt") jwt: String?, @RequestBody locationDTO: LocationDTO) : ResponseEntity<Any> {
+    fun getLocationGroups(@RequestHeader("jwt") jwt: String?, @RequestBody locationDTO: LocationDTO, response: HttpServletResponse) : ResponseEntity<Any> {
+        response.addHeader("Access-Control-Allow-Origin", "*")
         val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
         user.setLocation(locationDTO)
         val groups: List <GroupDB> = emptyList()
