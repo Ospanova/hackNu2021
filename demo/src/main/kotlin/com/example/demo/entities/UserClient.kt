@@ -1,4 +1,5 @@
 package com.example.demo.entities
+import com.example.demo.dtos.LocationDTO
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.time.LocalDateTime
@@ -9,8 +10,8 @@ class UserClient(
     var username: String,
     var firstname: String? = null,
     var lastname: String? = null,
-    val XLocation: Double = 0.0,
-    val YLocation: Double = 0.0,
+    var XLocation: Double = 0.0,
+    var YLocation: Double = 0.0,
     @Column(unique = true)
     var email: String,
     @Id @GeneratedValue(strategy = GenerationType.AUTO) val id: Long = 0) {
@@ -28,5 +29,9 @@ class UserClient(
 
     public fun comparePassword(password: String) : Boolean{
         return BCryptPasswordEncoder().matches(password, this.password)
+    }
+    fun setLocation(locationDTO: LocationDTO) {
+        this.XLocation = locationDTO.X
+        this.YLocation = locationDTO.Y
     }
 }

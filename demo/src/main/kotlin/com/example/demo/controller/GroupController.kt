@@ -1,6 +1,7 @@
 package com.example.demo.controller
 
 import com.example.demo.controller.models.Group
+import com.example.demo.dtos.LocationDTO
 import com.example.demo.dtos.ResponseMessage
 import com.example.demo.entities.GroupDB
 import com.example.demo.entities.Subscription
@@ -26,7 +27,7 @@ class GroupController (val service: SubscriptionService, val groupRepository: Gr
     fun newGroup(@RequestHeader("jwt") jwt: String?, @RequestBody group: GroupDB): ResponseEntity<GroupDB> {
         val newGroup = this.groupRepository.save(group)
         if (jwt != null) {
-            val user = jwt?.let { userService.getUserFromCookie(it) }
+            val user = userService.getUserFromCookie(jwt)
             if (user != null) {
                 newGroup.id?.let { service.addNew(user.id, it) }
             }
@@ -38,6 +39,16 @@ class GroupController (val service: SubscriptionService, val groupRepository: Gr
         val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
         service.addNew(user.id, groupId)
         return ResponseEntity.ok(ResponseMessage("success"))
+    }
+    @GetMapping("locationGroups")
+    fun getLocationGroups(@RequestHeader("jwt") jwt: String?, @RequestBody locationDTO: LocationDTO) : ResponseEntity<Any> {
+        val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
+        user.setLocation(locationDTO)
+        val groups: List <GroupDB> = emptyList()
+//        locationDTO.getNormalizeLocation().map{
+//            groups.plusElement(groupRepository.getAllByLocationIndex(it)).get(0)
+//        }
+        return ResponseEntity.ok(groups)
     }
 
 }

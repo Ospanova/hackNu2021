@@ -22,35 +22,41 @@ class AuthController(val userService: UserService) {
 
     @PostMapping("register")
     fun register(@RequestBody body: RegisterDTO) : ResponseEntity<UserClient> {
+        println("Register " + body.toString())
         val user  = UserClient(username = body.username, email = body.email)
         user.password = body.password
+        println("Success.Register " + user.toString())
         return ResponseEntity.ok(this.userService.save(user))
     }
 
 
     @PostMapping("login")
     fun login(@RequestBody body: LoginDTO, response: HttpServletResponse) : ResponseEntity<Any> {
-        val user: UserClient = (this.userService.findByEmail(body.email) ?: return ResponseEntity.badRequest().body(ResponseMessage(message = "User not found!")))
+        println("Login " + body.toString())
+        val user: UserClient = (this.userService.findByUsername(body.username) ?: return ResponseEntity.badRequest().body(ResponseMessage(message = "User not found!")))
         if (!user.comparePassword(body.password))
             return ResponseEntity.badRequest().body(ResponseMessage("Invalid password"))
         val issuer = user.id.toString()
-        val token = Jwts.builder().setIssuer(issuer).setExpiration(Date(System.currentTimeMillis() + 60*24*300000))
+        val token = Jwts.builder().setIssuer(issuer).setExpiration(Date(System.currentTimeMillis() + 60*24*60*60*10000))
             .signWith(SignatureAlgorithm.HS256, "secret").compact()
         val cookie  = Cookie("jwt", token)
         cookie.isHttpOnly = true
         response.addCookie(cookie)
+        println("Success.Login " + user.toString())
         return ResponseEntity.ok(ResponseMessage("success"))
     }
     @GetMapping("user")
     fun user(@CookieValue("jwt") jwt: String?) : ResponseEntity<Any> {
         try {
             if (jwt == null) {
-                return ResponseEntity.status(401).body(ResponseMessage("Unathorized"))
+                return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
             }
             return ResponseEntity.ok(userService.getUserFromCookie(jwt))
         } catch(e: Exception) {
-            return ResponseEntity.status(401).body(ResponseMessage("Unathorized"))
+            return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
         }
     }
+
+
 
 }
