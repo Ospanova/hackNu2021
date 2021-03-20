@@ -7,11 +7,11 @@ import javax.persistence.Id
 import javax.persistence.ManyToMany
 
 @Entity
-class GroupDB (
+class GroupDB ( // toDo add type
     var level: String? = null,
     var name: String = "",
     var locationIndex: Long? = null,
-    var userId: Long? = null,
+    var admin: Long? = null,
     @Id @GeneratedValue
     var id: Long? = null
 ) {

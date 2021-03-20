@@ -10,9 +10,12 @@ class MessageDB (
     var text: String,
     var userId: Long,
     var replyTo: Long? = null,
-    var visible: Boolean,
+    var visible: Boolean = true,
     val createdAt: Date,
+    val groupId: Long? = null,
     @Id
     @GeneratedValue
     var id: Long? = null
-)
+)  {
+    private constructor() : this(text = "", userId = 0, createdAt = Date(System.currentTimeMillis()))
+}

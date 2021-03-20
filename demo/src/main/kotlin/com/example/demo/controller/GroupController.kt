@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/groups")
 class GroupController (val service: SubscriptionService, val groupRepository: GroupRepository, val userService: UserService) {
     @GetMapping
-    fun findAll(@RequestHeader("jwt") jwt: String?, ): ResponseEntity<List <Group>> {
-        val user = jwt?.let { userService.getUserFromCookie(it) } ?: throw Exception("Unauthorized")
+    fun findAll(@RequestHeader("jwt") jwt: String?): ResponseEntity<Any> {
+        val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unathorized"))
         val groups = this.service.getSubscibedGroups(user.id).toSet().map {
             val group = groupRepository.getOne(it)
             Group(level = group.level, group.name, null, group.id ?: 0)
@@ -37,4 +37,5 @@ class GroupController (val service: SubscriptionService, val groupRepository: Gr
         service.addNew(user.id, groupId)
         return ResponseEntity.ok(ResponseMessage("success"))
     }
+
 }
