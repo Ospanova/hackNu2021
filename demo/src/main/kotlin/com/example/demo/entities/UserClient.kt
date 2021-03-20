@@ -8,6 +8,7 @@ class UserClient(
     var username: String,
     var firstname: String? = null,
     var lastname: String? = null,
+    var location: Location
     @Column(unique = true)
     var email: String,
     @Id @GeneratedValue(strategy = GenerationType.AUTO) val id: Long = 0) {
