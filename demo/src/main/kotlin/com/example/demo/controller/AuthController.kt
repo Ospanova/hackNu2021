@@ -49,7 +49,7 @@ class AuthController(val userService: UserService) {
         return ResponseEntity.ok(Token(token))
     }
     @GetMapping("user")
-    fun user(@CookieValue("jwt") jwt: String?) : ResponseEntity<Any> {
+    fun user(@RequestHeader("jwt") jwt: String?) : ResponseEntity<Any> {
         try {
             if (jwt == null) {
                 return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
