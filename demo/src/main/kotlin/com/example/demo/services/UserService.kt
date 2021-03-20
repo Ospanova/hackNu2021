@@ -2,6 +2,7 @@ package com.example.demo.services
 
 import com.example.demo.entities.UserClient
 import com.example.demo.repositories.UserRepository
+import io.jsonwebtoken.Jwts
 import org.springframework.stereotype.Service
 
 @Service
@@ -11,5 +12,11 @@ class UserService (private val repository: UserRepository) {
     }
     fun findByEmail(email:String) : UserClient? {
         return this.repository.findByEmail(email)
+    }
+    fun getById(id: Long) : UserClient? {
+        return this.repository.getOne(id)
+    }
+    fun getUserFromCookie(cookie: String) : UserClient? {
+        return this.getById(Jwts.parser().setSigningKey("secret").parseClaimsJws(cookie).body.issuer.toLong())
     }
 }

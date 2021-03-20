@@ -10,7 +10,11 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.lang.Exception
 import java.util.*
+import javax.servlet.http.Cookie
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/api")
@@ -25,18 +29,28 @@ class AuthController(val userService: UserService) {
 
 
     @PostMapping("login")
-    fun login(@RequestBody body: LoginDTO) : ResponseEntity<Any> {
-        val user: UserClient = (this.userService.findByEmail(body.email) ?: ResponseEntity.badRequest().body(ResponseMessage(message = "User not found!"))) as UserClient
+    fun login(@RequestBody body: LoginDTO, response: HttpServletResponse) : ResponseEntity<Any> {
+        val user: UserClient = (this.userService.findByEmail(body.email) ?: return ResponseEntity.badRequest().body(ResponseMessage(message = "User not found!")))
         if (!user.comparePassword(body.password))
             return ResponseEntity.badRequest().body(ResponseMessage("Invalid password"))
         val issuer = user.id.toString()
         val token = Jwts.builder().setIssuer(issuer).setExpiration(Date(System.currentTimeMillis() + 60*24*3000))
             .signWith(SignatureAlgorithm.HS256, "secret").compact()
-
-        return ResponseEntity.ok(token)
+        val cookie  = Cookie("jwt", token)
+        cookie.isHttpOnly = true
+        response.addCookie(cookie)
+        return ResponseEntity.ok(ResponseMessage("success"))
+    }
+    @GetMapping("user")
+    fun user(@CookieValue("jwt") jwt: String?) : ResponseEntity<Any> {
+        try {
+            if (jwt == null) {
+                return ResponseEntity.status(401).body(ResponseMessage("Unathorized"))
+            }
+            return ResponseEntity.ok(userService.getUserFromCookie(jwt))
+        } catch(e: Exception) {
+            return ResponseEntity.status(401).body(ResponseMessage("Unathorized"))
+        }
     }
 
-
-//    @GetMapping("/{login}")
-//    fun findOne(@PathVariable login: String) = repository.findByLogin(login) ?: throw ResponseStatusException(NOT_FOUND, "This user does not exist")
 }
