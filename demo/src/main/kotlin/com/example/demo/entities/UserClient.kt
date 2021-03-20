@@ -7,12 +7,12 @@ import javax.persistence.*
 
 @Entity
 class UserClient(
+    @Column(unique = true)
     var username: String,
     var firstname: String? = null,
     var lastname: String? = null,
     var XLocation: Double = 0.0,
     var YLocation: Double = 0.0,
-    @Column(unique = true)
     var email: String,
     @Id @GeneratedValue(strategy = GenerationType.AUTO) val id: Long = 0) {
 
