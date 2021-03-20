@@ -34,7 +34,7 @@ class AuthController(val userService: UserService) {
         if (!user.comparePassword(body.password))
             return ResponseEntity.badRequest().body(ResponseMessage("Invalid password"))
         val issuer = user.id.toString()
-        val token = Jwts.builder().setIssuer(issuer).setExpiration(Date(System.currentTimeMillis() + 60*24*3000))
+        val token = Jwts.builder().setIssuer(issuer).setExpiration(Date(System.currentTimeMillis() + 60*24*300000))
             .signWith(SignatureAlgorithm.HS256, "secret").compact()
         val cookie  = Cookie("jwt", token)
         cookie.isHttpOnly = true

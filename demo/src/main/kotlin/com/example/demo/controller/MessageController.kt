@@ -15,7 +15,7 @@ import java.sql.Date
 class MessageController (val repository: MessageRepository, val userService: UserService){
     @GetMapping
     fun getMessages(@RequestHeader("jwt") jwt: String?, @RequestBody getMessage: GetMessageDTO) : ResponseEntity<Any> {
-        val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unathorized"))
+        val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
         if (getMessage.groupId != null)
             return ResponseEntity.ok(repository.getAllByGroupIdAndVisible(getMessage.groupId, getMessage.visible ?: true))
         if (getMessage.replyTo != null)
@@ -25,7 +25,7 @@ class MessageController (val repository: MessageRepository, val userService: Use
 
     @PostMapping
     fun sendMessage(@RequestHeader("jwt") jwt: String?, @RequestBody message: MessageDTO) : ResponseEntity <Any> {
-        val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unathorized"))
+        val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
         repository.save(MessageDB(
             text = message.text,
             userId = user.id,

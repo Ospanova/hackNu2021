@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 class GroupController (val service: SubscriptionService, val groupRepository: GroupRepository, val userService: UserService) {
     @GetMapping
     fun findAll(@RequestHeader("jwt") jwt: String?): ResponseEntity<Any> {
-        val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unathorized"))
+        val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
         val groups = this.service.getSubscibedGroups(user.id).toSet().map {
             val group = groupRepository.getOne(it)
             Group(level = group.level, group.name, null, group.id ?: 0)
@@ -25,15 +25,17 @@ class GroupController (val service: SubscriptionService, val groupRepository: Gr
     @PostMapping
     fun newGroup(@RequestHeader("jwt") jwt: String?, @RequestBody group: GroupDB): ResponseEntity<GroupDB> {
         val newGroup = this.groupRepository.save(group)
-        val user = jwt?.let { userService.getUserFromCookie(it) }
-        if (user != null) {
-            newGroup.id?.let { service.addNew(user.id, it) }
+        if (jwt != null) {
+            val user = jwt?.let { userService.getUserFromCookie(it) }
+            if (user != null) {
+                newGroup.id?.let { service.addNew(user.id, it) }
+            }
         }
         return ResponseEntity.ok(newGroup)
     }
     @PostMapping("pin/{groupId}")
     fun pinGroup(@RequestHeader("jwt") jwt: String?, @PathVariable groupId: Long) : ResponseEntity<Any> {
-        val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unathorized"))
+        val user = jwt?.let { userService.getUserFromCookie(it) } ?: return ResponseEntity.status(401).body(ResponseMessage("Unauthorized"))
         service.addNew(user.id, groupId)
         return ResponseEntity.ok(ResponseMessage("success"))
     }
