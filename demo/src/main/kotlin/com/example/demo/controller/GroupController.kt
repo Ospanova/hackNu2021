@@ -24,12 +24,12 @@ class GroupController (val service: SubscriptionService, val groupRepository: Gr
     }
     @PostMapping
     fun newGroup(@RequestHeader("jwt") jwt: String?, @RequestBody group: GroupDB): ResponseEntity<GroupDB> {
-        val group = this.groupRepository.save(group)
+        val newGroup = this.groupRepository.save(group)
         val user = jwt?.let { userService.getUserFromCookie(it) }
         if (user != null) {
-            group.id?.let { service.addNew(user.id, it) }
+            newGroup.id?.let { service.addNew(user.id, it) }
         }
-        return ResponseEntity.ok(group)
+        return ResponseEntity.ok(newGroup)
     }
     @PostMapping("pin/{groupId}")
     fun pinGroup(@RequestHeader("jwt") jwt: String?, @PathVariable groupId: Long) : ResponseEntity<Any> {
