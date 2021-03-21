@@ -9,7 +9,7 @@ import javax.persistence.ManyToMany
 
 @Entity
 class GroupDB ( // toDo add type
-    var level: String? = null,
+    var level: String = "",
     var name: String = "",
     var longitude: Long? = null,
     var latitude: Long? = null,

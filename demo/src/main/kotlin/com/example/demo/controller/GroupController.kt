@@ -58,7 +58,7 @@ class GroupController (val service: SubscriptionService, val groupRepository: Gr
         service.addNew(user.id, groupId)
         return ResponseEntity.ok(ResponseMessage("success"))
     }
-    @GetMapping("locationGroups")
+    @PostMapping("locationGroups")
     fun getLocationGroups(@RequestHeader("jwt") jwt: String?, @RequestBody locationDTO: LocationDTO, response: HttpServletResponse) : ResponseEntity<Any?> {
         response.addHeader("Access-Control-Allow-Origin", "http://192.168.1.81:3000")
         response.addHeader("access-control-expose-headers", "Location")
@@ -66,8 +66,12 @@ class GroupController (val service: SubscriptionService, val groupRepository: Gr
         user.setLocation(locationDTO)
         val data = CardType.values().map {  type ->
             val g = this.groupRepository.getByLongitudeAndLatitude((locationDTO.longitude*type.coefficient).toLong(), (locationDTO.latitude*type.coefficient).toLong())
-            if (g != null) {
-                type to Group(g.level, g.name, null, id = g.id ?: 0)
+            if (!g.isEmpty()) {
+                val group = g.get(0)
+                if (group != null) {
+                    type to Group(group.level, group.name, null, id = group.id ?: 0)
+                } else
+                    type to null
             } else
                 type to null
         }.toMap()
