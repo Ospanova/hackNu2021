@@ -1,5 +1,6 @@
 package com.example.demo.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.sql.Date
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -10,7 +11,9 @@ class MessageDB (
     var text: String,
     var userId: Long,
     var replyTo: Long? = null,
+    @JsonIgnore
     var visible: Boolean = true,
+    @JsonIgnore
     val createdAt: Date,
     val groupId: Long? = null,
     @Id

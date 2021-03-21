@@ -31,7 +31,7 @@ class UserClient(
         return BCryptPasswordEncoder().matches(password, this.password)
     }
     fun setLocation(locationDTO: LocationDTO) {
-        this.XLocation = locationDTO.X
-        this.YLocation = locationDTO.Y
+        this.XLocation = locationDTO.longitude
+        this.YLocation = locationDTO.latitude
     }
 }

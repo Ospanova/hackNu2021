@@ -26,7 +26,7 @@ class AuthController(val userService: UserService) {
         println("Register " + body.toString())
         val user  = UserClient(username = body.username, email = body.email)
         user.password = body.password
-        response.addHeader("Access-Control-Allow-Origin", "*")
+        response.addHeader("Access-Control-Allow-Origin", "http://192.168.1.81:3000")
         println("Success.Register " + user.toString())
         return ResponseEntity.ok(this.userService.save(user))
     }
@@ -44,7 +44,7 @@ class AuthController(val userService: UserService) {
 //        val cookie  = Cookie("jwt", token)
 //        cookie.isHttpOnly = true
 //        response.addCookie(cookie)
-        response.addHeader("Access-Control-Allow-Origin", "*")
+        response.addHeader("Access-Control-Allow-Origin", "http://192.168.1.81:3000")
         println("Success.Login " + user.toString())
         return ResponseEntity.ok(Token(token))
     }
